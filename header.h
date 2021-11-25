@@ -1,13 +1,13 @@
 #include <iostream>
 #include <locale.h>
 #include <fstream>
-#include <string>  
-#include <vector>  
-#include <sstream>  
+#include <string>
+#include <vector>
+#include <sstream>
 #include <cstdlib>
 struct Aluno {
 	std::string nome;
-	float matricula;
+	std::string matricula;
 	float aep1 = 0;
 	float prova1 = 0;
 	float aep2 = 0;
@@ -21,13 +21,13 @@ struct Aluno {
 bool cadastraAluno (Aluno aluno) {
 	std::ofstream arquivo;
 	arquivo.open("database.csv", std::fstream::app);
-	
+
 	if (!arquivo.is_open()) {
 		std::cout << "Houve um erro ao abrir o arquivo!\n";
-		return false;	
+		return false;
 	}
-	
-	arquivo << aluno.nome << ";" 
+
+	arquivo << aluno.nome << ";"
 			<< aluno.matricula << ";"
 			<< aluno.aep1 << ";"
 			<< aluno.prova1 << ";"
@@ -35,8 +35,8 @@ bool cadastraAluno (Aluno aluno) {
 			<< aluno.prova2 << ";"
 			<< aluno.sub << ";"
 			<< aluno.media << ";"
-			<< aluno.status << "\n";
-	
+			<< aluno.status << ";\n";
+
 	arquivo.close();
 	return true;
 }
@@ -54,8 +54,8 @@ void cadastro () {
 	alunoCadastro.prova2 = 0;
 	alunoCadastro.media = 0;
 	alunoCadastro.sub = 0;
-	alunoCadastro.status = " ";
-	
+	alunoCadastro.status = "reprovado";
+
 	if (cadastraAluno (alunoCadastro)) {
 		std::cout << "Aluno cadastrado.\n";
 	} else {
@@ -69,8 +69,8 @@ void lista(){
 	int b = 0;
 	char delimitador = ';';
 	std::string str;
-	std::fstream arquivo;
-	std::ofstream arquivo_geral;
+	std::ifstream arquivo;
+	std::ofstream arquivo_new_geral;
 	std::ofstream arquivo_sub1;
 	std::ofstream arquivo_sub2;
 	std::ofstream arquivo_aprovados;
@@ -94,18 +94,18 @@ void lista(){
 	int i = 0;
 	arquivo.close();
 	std::vector<struct Aluno> alunos(b);
-	
+
 	// jogar todas as linhas para linha[i]
-	
+
 	arquivo.open("database.csv", std::ios::in);
 	do{
 		arquivo >> linha[i];
 		i++;
 	}while(getline(arquivo, line));
 	arquivo.close();
-	
+
 	//dividir as linhas para a estrutura
-	
+
 	for(int i = 0; i < b; i++){
 		w = 0;
 		std::stringstream X(linha[i]);
@@ -129,38 +129,35 @@ void lista(){
 			} else if(w == 8){
 				alunos[i].status = str;
 			}
-			w++;	
-		}	
+			w++;
+		}
 	}
 	//switch opcoes das listas
-	
+
 	int opcao_lista = 0;
 	while (opcao_lista != 6){
-		std::cout << "Escolha uma das opÃ§Ãµes a seguir: " << std::endl
+		std::cout << "Escolha uma das opções a seguir: " << std::endl
 		          << "Digite 1 para lista geral de alunos" << std::endl
 		          << "Digite 2 para lista de alunos reprovados" << std::endl
 		          << "Digite 3 para lista de alunos aprovados" << std::endl
-		          << "Digite 4 para lista de alunos que precisÃ£o da substitutiva do primeiro bimestre" << std::endl
-		          << "Digite 5 para lista de alunos que precisÃ£o da substitutiva do segundo bimestre" << std::endl
+		          << "Digite 4 para lista de alunos que precisão da substitutiva do primeiro bimestre" << std::endl
+		          << "Digite 5 para lista de alunos que precisão da substitutiva do segundo bimestre" << std::endl
 				  << "Digite 6 para voltar" << std::endl;
 		          std::cin >> opcao_lista;
 		          system("cls");
     switch(opcao_lista){
       	case 1:
       		//gerar arquivo
-      		
       		system("cls");
-			arquivo_geral.open("geral.csv");
-			
-			if (!arquivo_geral.is_open()) {
+            arquivo_new_geral.open("geral1.csv");
+
+			if (!arquivo_new_geral.is_open()) {
 				std::cout << "Houve um erro ao abrir o arquivo!\n";
-				break;	
+				break;
 			}
-			
       		//criar arquivo geral
-      		
 			for(int i = 0; i < b; i++){
-				arquivo_geral << alunos[i].nome << ";" 
+				arquivo_new_geral << alunos[i].nome << ";"
 								<< alunos[i].matricula << ";"
 								<< alunos[i].aep1 << ";"
 								<< alunos[i].prova1 << ";"
@@ -170,24 +167,26 @@ void lista(){
 								<< alunos[i].media << ";"
 								<< alunos[i].status << "\n";
 			}
-			arquivo_geral.close();	
-			std::cout << "RELATÃ“RIO ATUALIZADO!" << std::endl;
+            arquivo_new_geral.close();
+            remove("geral.csv");
+            rename("geral1.csv", "geral.csv");
+			std::cout << "RELATÓRIO ATUALIZADO!" << std::endl;
       	break;
       	case 2:
       		//gerar arquivo
-      		
+
       		system("cls");
-			arquivo_reprovados.open("reprovados.csv");
-			
+			arquivo_reprovados.open("reprovados1.csv");
+
 			if (!arquivo_reprovados.is_open()) {
 				std::cout << "Houve um erro ao abrir o arquivo!\n";
-				break;	
+				break;
 			}
-			
+
       		//printar na tela todos os alunos reprovados
       		for(int i = 0; i < b; i++){
       			if(alunos[i].status == "reprovado"){
-      				arquivo_reprovados << alunos[i].nome << ";" 
+      				arquivo_reprovados << alunos[i].nome << ";"
 								<< alunos[i].matricula << ";"
 								<< alunos[i].aep1 << ";"
 								<< alunos[i].prova1 << ";"
@@ -198,23 +197,25 @@ void lista(){
 								<< alunos[i].status << "\n";
 				  }
 			}
-			arquivo_reprovados.close();	
-			std::cout << "RELATÃ“RIO ATUALIZADO!" << std::endl;
+			arquivo_reprovados.close();
+			remove("reprovados.csv");
+            rename("reprovados1.csv", "reprovados.csv");
+			std::cout << "RELATÓRIO ATUALIZADO!" << std::endl;
       	break;
       	case 3:
       		//gerar arquivo
-      		
+
       		system("cls");
-			arquivo_aprovados.open("aprovados.csv");
-			
+			arquivo_aprovados.open("aprovados1.csv");
+
 			if (!arquivo_aprovados.is_open()) {
 				std::cout << "Houve um erro ao abrir o arquivo!\n";
-				break;	
+				break;
 			}
       		//printar na tela todos os alunos reprovados
       		for(int i = 0; i < b; i++){
       			if(alunos[i].status == "aprovado"){
-      				arquivo_aprovados << alunos[i].nome << ";" 
+      				arquivo_aprovados << alunos[i].nome << ";"
 								<< alunos[i].matricula << ";"
 								<< alunos[i].aep1 << ";"
 								<< alunos[i].prova1 << ";"
@@ -225,23 +226,25 @@ void lista(){
 								<< alunos[i].status << "\n";
 				  }
 			}
-			arquivo_aprovados.close();	
-			std::cout << "RELATÃ“RIO ATUALIZADO!" << std::endl;
+			arquivo_aprovados.close();
+			remove("aprovados.csv");
+            rename("aprovados1.csv", "aprovados.csv");
+			std::cout << "RELATÓRIO ATUALIZADO!" << std::endl;
       	break;
       	case 4:
       		//gerar arquivo
-      		
+
       		system("cls");
-			arquivo_sub1.open("sub_1_bm.csv");
-			
+			arquivo_sub1.open("sub_1_bm1.csv");
+
 			if (!arquivo_sub1.is_open()) {
 				std::cout << "Houve um erro ao abrir o arquivo!\n";
-				break;	
+				break;
 			}
       		//printar na tela todos os alunos que precisam da substitutiva 1bm
       		for(int i = 0; i < b; i++){
       			if((alunos[i].aep1 +  alunos[i].prova1) < 6){
-      				arquivo_sub1 << alunos[i].nome << ";" 
+      				arquivo_sub1 << alunos[i].nome << ";"
 							<< alunos[i].matricula << ";"
 							<< alunos[i].aep1 << ";"
 							<< alunos[i].prova1 << ";"
@@ -252,24 +255,26 @@ void lista(){
 							<< alunos[i].status << "\n";
 				  }
 			  }
-			   arquivo_sub1.close();
-			  std::cout << "RELATÃ“RIO ATUALIZADO!" << std::endl;
-			  
+            arquivo_sub1.close();
+            remove("sub_1_bm.csv");
+            rename("sub_1_bm1.csv", "sub_1_bm.csv");
+            std::cout << "RELATÓRIO ATUALIZADO!" << std::endl;
+
       	break;
       	case 5:
       		//gerar arquivo
-      		
+
       		system("cls");
-			arquivo_sub2.open("sub_2_bm.csv", std::fstream::app);
-			
+			arquivo_sub2.open("sub_2_bm1.csv");
+
 			if (!arquivo_sub2.is_open()) {
 				std::cout << "Houve um erro ao abrir o arquivo!\n";
-				break;	
+				break;
 			}
       		//printar na tela todos os alunos que precisam da substitutiva 1bm
       		for(int i = 0; i < b; i++){
       			if((alunos[i].aep2 +  alunos[i].prova2) < 6){
-      				arquivo_sub2 << alunos[i].nome << ";" 
+      				arquivo_sub2 << alunos[i].nome << ";"
 								<< alunos[i].matricula << ";"
 								<< alunos[i].aep1 << ";"
 								<< alunos[i].prova1 << ";"
@@ -280,9 +285,11 @@ void lista(){
 								<< alunos[i].status << "\n";
 				  }
 			  }
-			   arquivo_sub2.close();
-			  std::cout << "RELATÃ“RIO ATUALIZADO!" << std::endl;
-			 
+            arquivo_sub2.close();
+            remove("sub_2_bm.csv");
+            rename("sub_2_bm1.csv", "sub_2_bm.csv");
+            std::cout << "RELATÓRIO ATUALIZADO!" << std::endl;
+
       	break;
 		}
 	}
@@ -292,7 +299,7 @@ void lista(){
 
 void cadastrar_notas (){
 	system("cls");
-	int matricula_alt = 0;
+	std::string matricula_alt;
 	std::cout << "Digite uma matricula para alterar as notas: ";
 	std::cin >> matricula_alt;
 	//variaveis
@@ -318,21 +325,20 @@ void cadastrar_notas (){
 	}
 	std::string line;
 	std::string linha[b];
-	int i = 0;
+	int tamanho = 0;
 	arquivo.close();
 	std::vector<struct Aluno> alunos(b);
-	
+
 	// jogar todas as linhas para linha[i]
-	
+
 	arquivo.open("database.csv", std::ios::in);
 	do{
-		arquivo >> linha[i];
-		i++;
+		arquivo >> linha[tamanho];
+		tamanho++;
 	}while(getline(arquivo, line));
 	arquivo.close();
-	
+
 	//dividir as linhas para a estrutura
-	
 	for(int i = 0; i < b; i++){
 		w = 0;
 		std::stringstream X(linha[i]);
@@ -356,13 +362,13 @@ void cadastrar_notas (){
 			} else if(w == 8){
 				alunos[i].status = str;
 			}
-			w++;	
-		}	
+			w++;
+		}
 	}
-	//laÃ§o para encontrar a matricula correta e alterar as notas
+	//laço para encontrar a matricula correta e alterar as notas
 	for(int i = 0; i < b; i++){
 		if(alunos[i].matricula == matricula_alt){
-			std::cout << " Nome: " << alunos[i].nome 
+			std::cout << " Nome: " << alunos[i].nome
 					<< " Matricula: " << alunos[i].matricula
 					<< " AEP1: " << alunos[i].aep1
 					<< " Prova1: " << alunos[i].prova1
@@ -371,7 +377,7 @@ void cadastrar_notas (){
 					<< " SUB1: " << alunos[i].sub
 					<< " Media: " << alunos[i].media
 					<< " Status: " << alunos[i].status << std::endl;
-			std::cout << "Escolha uma das opÃ§Ãµes a seguir: " << std::endl
+			std::cout << "Escolha uma das opções a seguir: " << std::endl
 		          << "Digite 1 alterar a nota da AEP1" << std::endl
 		          << "Digite 2 alterar a nota da prova1" << std::endl
 		          << "Digite 3 alterar a nota da AEP2" << std::endl
@@ -382,7 +388,7 @@ void cadastrar_notas (){
 	    	switch(opcao_notas){
 	    		case 1:
 	    			system("cls");
-	    			std::cout << " Nome: " << alunos[i].nome 
+	    			std::cout << " Nome: " << alunos[i].nome
 								<< " Matricula: " << alunos[i].matricula
 								<< " AEP1: " << alunos[i].aep1
 								<< " Prova1: " << alunos[i].prova1
@@ -411,7 +417,7 @@ void cadastrar_notas (){
 	    		break;
 	    		case 2:
 	    			system("cls");
-	    			std::cout << " Nome: " << alunos[i].nome 
+	    			std::cout << " Nome: " << alunos[i].nome
 								<< " Matricula: " << alunos[i].matricula
 								<< " AEP1: " << alunos[i].aep1
 								<< " Prova1: " << alunos[i].prova1
@@ -441,7 +447,7 @@ void cadastrar_notas (){
 	    		break;
 	    		case 3:
 	    			system("cls");
-	    			std::cout << " Nome: " << alunos[i].nome 
+	    			std::cout << " Nome: " << alunos[i].nome
 								<< " Matricula: " << alunos[i].matricula
 								<< " AEP1: " << alunos[i].aep1
 								<< " Prova1: " << alunos[i].prova1
@@ -470,7 +476,7 @@ void cadastrar_notas (){
 	    		break;
 	    		case 4:
 	    			system("cls");
-	    			std::cout << " Nome: " << alunos[i].nome 
+	    			std::cout << " Nome: " << alunos[i].nome
 								<< " Matricula: " << alunos[i].matricula
 								<< " AEP1: " << alunos[i].aep1
 								<< " Prova1: " << alunos[i].prova1
@@ -499,7 +505,7 @@ void cadastrar_notas (){
 	    		break;
 	    		case 5:
 	    			system("cls");
-	    			std::cout << " Nome: " << alunos[i].nome 
+	    			std::cout << " Nome: " << alunos[i].nome
 								<< " Matricula: " << alunos[i].matricula
 								<< " AEP1: " << alunos[i].aep1
 								<< " Prova1: " << alunos[i].prova1
@@ -529,35 +535,42 @@ void cadastrar_notas (){
 			}
 		}
 	}
-	arquivo.open("database.csv");
+	std::ofstream arquivo_new;
+	arquivo_new.open("database1.csv");
+
 	// contar numero de linhas do arquivo
-	if (!arquivo.is_open()) {
+	if (!arquivo_new.is_open()) {
 		std::cout << "Houve um erro ao abrir o arquivo!\n";
 	}
 	else{
 		for(int i = 0; i < b; i++){
 			if(alunos[i].media >= 6){
-				arquivo << alunos[i].nome << ";" 
-					<< alunos[i].matricula << ";"
-					<< alunos[i].aep1 << ";"
-					<< alunos[i].prova1 << ";"
-					<< alunos[i].aep2 << ";"
-					<< alunos[i].prova2 << ";"
-					<< alunos[i].sub << ";"
-					<< alunos[i].media << ";"
-					<< "aprovado" << "\n";
-			} else {
-				arquivo << alunos[i].nome << ";" 
-					<< alunos[i].matricula << ";"
-					<< alunos[i].aep1 << ";"
-					<< alunos[i].prova1 << ";"
-					<< alunos[i].aep2 << ";"
-					<< alunos[i].prova2 << ";"
-					<< alunos[i].sub << ";"
-					<< alunos[i].media << ";"
-					<< "reprovado" << "\n";
+                alunos[i].status = "aprovado";
+                arquivo_new << alunos[i].nome << ";"
+                        << alunos[i].matricula << ";"
+                        << alunos[i].aep1 << ";"
+                        << alunos[i].prova1 << ";"
+                        << alunos[i].aep2 << ";"
+                        << alunos[i].prova2 << ";"
+                        << alunos[i].sub << ";"
+                        << alunos[i].media << ";"
+                        << alunos[i].status << "\n";
+			 }else {
+                alunos[i].status = "reprovado";
+                arquivo_new << alunos[i].nome << ";"
+                        << alunos[i].matricula << ";"
+                        << alunos[i].aep1 << ";"
+                        << alunos[i].prova1 << ";"
+                        << alunos[i].aep2 << ";"
+                        << alunos[i].prova2 << ";"
+                        << alunos[i].sub << ";"
+                        << alunos[i].media << ";"
+                        << alunos[i].status << "\n";
 			}
 		}
 	}
-	arquivo.close();
+	arquivo_new.close();
+    remove("database.csv");
+	rename("database1.csv", "database.csv");
+
 }
