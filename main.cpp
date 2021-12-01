@@ -1,5 +1,5 @@
-#include"header.h"
-
+#include "header.h"
+#include "funcoes.cpp";
 int main() {
 	setlocale(LC_ALL, "portuguese");
 	int opcao = 0;
